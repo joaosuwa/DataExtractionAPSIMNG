@@ -1,4 +1,7 @@
 import re
+import pandas as pd
+import csv
+from typing import List, Dict, Any
 
 
 class FieldReader:
@@ -40,3 +43,18 @@ class FieldReader:
 
     def __repr__(self) -> str:
         return f"FieldReader({self.path!r}, {len(self.variables)} variáveis)"
+
+class CSVReader:
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+        self.df = pd.read_csv(path)
+
+    def get_headers(self) -> List[str]:
+        return self.df.columns.tolist()
+    
+    def get_rows(self) -> List[List[Any]]:
+        return self.df.values.tolist()
+
+    def get_columns_data(self, columns: List[str]) -> Dict[str, List[Any]]:
+        return self.df[columns].to_dict(orient='list')

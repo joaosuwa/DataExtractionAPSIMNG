@@ -3,7 +3,7 @@ import psutil
 import pandas as pd
 from synchronize import test_proto2, close_zmq2
 from commands import poll_zmq2
-from utils import FieldReader
+from utils import FieldReader, CSVReader
 from constants import APSIM_DIR, SIMULATION_DIR, FIELDS_FILE, OUTPUT_CSV
 
 field_reader = FieldReader(FIELDS_FILE)
@@ -24,8 +24,10 @@ poll_zmq2(
 elapsed = time.time() - start_time
 mem_mb  = proc.memory_info().rss / 1024**2
 
+csv_reader = CSVReader(OUTPUT_CSV)
+
 print(f"\nSimulação concluída em {elapsed:.2f}s | Memória: {mem_mb:.1f} MB")
 print(f"Resultados salvos em {OUTPUT_CSV}")
-print(pd.read_csv(OUTPUT_CSV))
+print(csv_reader.df)
 
 close_zmq2(apsim)
