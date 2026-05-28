@@ -1,30 +1,49 @@
-# ApsimNG data extraction and vizualization
-Basic data extraction and vizualization of data using the ApsimNG simulator.
+# APSIM Next Generation: Data Extraction & Visualization
 
-Uses the ApsimNG source code GitHub repository: <https://github.com/APSIMInitiative/ApsimX>
+A tool for the basic extraction and visualization of data using the APSIM Next Generation simulator. This project automates the retrieval and plotting of simulation results by interfacing directly with the APSIM source code.
 
-## Using the program:
-1. Git Clone the APSIM repository
-2. Git Clone this repository
+> **Note:** This project utilizes the official ApsimNG source code repository: [APSIMInitiative/ApsimX](https://github.com/APSIMInitiative/ApsimX)
 
-    Obs: Keep in mind where the repositories are being stored.
+---
 
-3. Install all the dependecies and libraries needed to execute the program.
+## ⚙️ Prerequisites
 
-    All needed libraries are in the pyproject.toml file
+Ensure you have the following installed before getting started:
+* Git
+* Python (dependencies are managed via `pyproject.toml`)
 
-4. Update the directories
+## 🚀 Installation & Setup
 
-    Update the directories in the file constants.py.
+**1. Clone the repositories**
+You will need to clone both the APSIM source code and this repository. Keep track of the local directories where these are stored, as you will need the paths for configuration.
 
-        - APSIM_DIR: Point where the ApsimNG source code is stored;
-        - SIMULATION_DIR: Point where the simulation .apsimx is stored;
-        - FIELDS_FILE: Point and update the report fields that you wish to extract and visualize (OPTIONAL).
+```bash
+git clone https://github.com/APSIMInitiative/ApsimX.git
+git clone https://github.com/joaosuwa/DataExtractionAPSIMNG.git
+cd your-repo-name
+```
 
-    Obs: When running the program, keep in mind that you may have to change the directory of where the .met file is located using your [Weather] manager when using your ApsimNG simulations, as the simulator doesn't change that automatically.
+**2. Install Dependencies**
+Install all necessary libraries required to execute the program. The required packages are defined in the `pyproject.toml` file.
 
-5. Run the program
+## 🔧 Configuration
 
-    Run the program executing the main.py file
+Update the environment directories in the `constants.py` file to point to your local setup:
 
-All the results are in the output archive
+* `APSIM_DIR`: The path where the ApsimNG source code is stored.
+* `SIMULATION_DIR`: The path where your `.apsimx` simulation files are stored.
+* `FIELDS_FILE`: *(Optional)* Point to and update the report fields that you wish to extract and visualize.
+
+> ⚠️ **Important:** When setting up your environment, keep in mind that you may have to manually change the directory of where your `.met` file is located using the `[Weather]` manager within your ApsimNG simulations. The simulator does not update this path automatically when moved.
+
+## 💻 Usage
+
+Once your constants are configured and dependencies are installed, simply run the main script:
+
+```bash
+python main.py
+```
+
+## 📊 Output
+
+All resulting data extractions and visualizations will be automatically generated and saved in the `output/` directory.
