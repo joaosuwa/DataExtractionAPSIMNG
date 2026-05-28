@@ -31,7 +31,7 @@
         {
           "$type": "Models.Climate.Weather, Models",
           "ConstantsFile": null,
-          "FileName": "data/Sorriso_A904_2024-09-01_a_2025-02-28.met",
+          "FileName": "Sorriso_A904_2024-09-01_a_2025-02-28.met",
           "ExcelWorkSheetName": "",
           "Name": "Weather",
           "ResourceName": null,

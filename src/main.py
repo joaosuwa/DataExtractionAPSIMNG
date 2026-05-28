@@ -4,13 +4,7 @@ import pandas as pd
 from synchronize import test_proto2, close_zmq2
 from commands import poll_zmq2
 from utils import FieldReader
-
-APSIM_DIR = "/home/joaosuwa/projetos/ApsimX"
-SIMULATION_DIR = (
-    f"{APSIM_DIR}/Tests/Simulation/ZMQ-Sync/DataExtraction/wheat_sorriso_script.apsimx"
-)
-FIELDS_FILE  = "data/fields.txt"
-OUTPUT_CSV   = "output/summary.csv"
+from constants import APSIM_DIR, SIMULATION_DIR, FIELDS_FILE, OUTPUT_CSV
 
 field_reader = FieldReader(FIELDS_FILE)
 print(field_reader)
