@@ -3,29 +3,35 @@ import psutil
 import pandas as pd
 from synchronize import test_proto2, close_zmq2
 from commands import poll_zmq2
-from summary import SummaryCollector
+from utils import FieldReader
 
-apsim_dir = "/home/joaosuwa/projetos/ApsimX"
-simulation_dir = (
-    f"{apsim_dir}/Tests/Simulation/ZMQ-Sync/DataExtraction/wheat_sorriso_script.apsimx"
+APSIM_DIR = "/home/joaosuwa/projetos/ApsimX"
+SIMULATION_DIR = (
+    f"{APSIM_DIR}/Tests/Simulation/ZMQ-Sync/DataExtraction/wheat_sorriso_script.apsimx"
 )
+FIELDS_FILE  = "data/fields.txt"
+OUTPUT_CSV   = "output/summary.csv"
 
-apsim = test_proto2(apsim_dir, simulation_dir)
-proc = psutil.Process(apsim["process"].pid)
+field_reader = FieldReader(FIELDS_FILE)
+print(field_reader)
+print("Variáveis:", field_reader.variables)
 
-# ── define quais colunas serão salvas (além de "iteration") ──────────────────
-FIELDS = ["day", "paw_0", "paw_1", "paw_2", "paw_3", "paw_4", "paw_5", "paw_6"]
+apsim = test_proto2(APSIM_DIR, SIMULATION_DIR)
+proc  = psutil.Process(apsim["process"].pid)
 
 start_time = time.time()
 
-with SummaryCollector(output_path="output/summary.csv", fields=FIELDS) as collector:
-    poll_zmq2(apsim["apsim_socket"], collector=collector)
+poll_zmq2(
+    socket=apsim["apsim_socket"],
+    field_reader=field_reader,
+    output_path=OUTPUT_CSV,
+)
 
-elapsed_time = time.time() - start_time
-mem_info = proc.memory_info().rss
+elapsed = time.time() - start_time
+mem_mb  = proc.memory_info().rss / 1024**2
 
-print(f"\nSimulação concluída em {elapsed_time:.2f}s | Memória: {mem_info / 1024**2:.1f} MB")
-print(f"Resultados salvos em output/summary.csv")
-print(pd.read_csv("output/summary.csv"))
+print(f"\nSimulação concluída em {elapsed:.2f}s | Memória: {mem_mb:.1f} MB")
+print(f"Resultados salvos em {OUTPUT_CSV}")
+print(pd.read_csv(OUTPUT_CSV))
 
 close_zmq2(apsim)

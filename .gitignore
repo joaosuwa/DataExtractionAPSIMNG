@@ -219,3 +219,7 @@ __marimo__/
 
 # CSV
 output/*.csv
+
+#apsim files
+*.apsimx.bak
+*.db

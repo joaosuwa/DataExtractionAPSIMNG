@@ -1,0 +1,6 @@
+# Variáveis do APSIM a serem coletadas em cada pausa
+# Uma expressão por linha. Listas são expandidas automaticamente (ex: paw_0, paw_1, ...).
+
+[Clock].Today.Day
+[Soil].Water.PAW
+[Weather].Rain

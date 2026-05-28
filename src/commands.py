@@ -1,6 +1,7 @@
 import zmq
 import msgpack
 from summary import SummaryCollector
+from utils import FieldReader
 
 
 def send_command(socket, command, args=None):
@@ -10,41 +11,66 @@ def send_command(socket, command, args=None):
             socket.send(msgpack.packb(arg), zmq.SNDMORE if i < len(args) - 1 else 0)
 
 
-def poll_zmq2(socket, collector: SummaryCollector | None = None):
+def _fetch_row(socket, field_reader: FieldReader) -> dict:
+    """
+    Busca todas as variáveis definidas em `field_reader` via ZMQ e
+    retorna um dicionário plano.
+    """
+    row: dict = {}
+    for var in field_reader.variables:
+        send_command(socket, "get", [var])
+        value = msgpack.unpackb(socket.recv())
+        key = field_reader.to_key(var)
+
+        if isinstance(value, list):
+            for i, v in enumerate(value):
+                row[f"{key}_{i}"] = v
+        else:
+            row[key] = value
+
+    return row
+
+
+def poll_zmq2(socket, field_reader: FieldReader, output_path: str) -> None:
     """
     Faz o polling do socket ZMQ.
 
-    Se um `SummaryCollector` for fornecido, registra os dados de cada
-    iteração (pausa) no arquivo de saída ao final de cada ciclo.
+    Na primeira pausa, determina automaticamente as colunas do CSV a
+    partir dos tipos retornados pelo APSIM e inicializa o
+    `SummaryCollector`. Nas pausas seguintes, apenas registra os dados.
+
+    Args:
+        socket:       Socket ZMQ já conectado.
+        field_reader: Instância de `FieldReader` com as variáveis a coletar.
+        output_path:  Caminho do arquivo CSV de saída.
     """
-    while True:
-        msg = socket.recv_string()
+    collector: SummaryCollector | None = None
 
-        if msg == "connect":
-            send_command(socket, "ok")
+    try:
+        while True:
+            msg = socket.recv_string()
 
-        elif msg == "paused":
-            send_command(socket, "get", ["[Clock].Today.Day"])
-            day: int = msgpack.unpackb(socket.recv())
-            assert isinstance(day, int)
-            print("Day:", day)
+            if msg == "connect":
+                send_command(socket, "ok")
 
-            send_command(socket, "get", ["[Soil].Water.PAW"])
-            paw: list = msgpack.unpackb(socket.recv())
-            assert isinstance(paw, list) and len(paw) == 7
-            print("PAW:", paw)
+            elif msg == "paused":
+                row = _fetch_row(socket, field_reader)
 
-            # ── persiste ao final de cada pausa ──────────────────────────
-            if collector is not None:
-                collector.record(
-                    day=day,
-                    paw_0=paw[0], paw_1=paw[1], paw_2=paw[2],
-                    paw_3=paw[3], paw_4=paw[4], paw_5=paw[5], paw_6=paw[6],
-                )
-            # ─────────────────────────────────────────────────────────────
+                # Inicialização lazy: colunas só são conhecidas após o
+                # primeiro fetch (listas têm tamanho variável).
+                if collector is None:
+                    collector = SummaryCollector(
+                        output_path=output_path,
+                        fields=list(row.keys()),
+                    )
 
-            send_command(socket, "resume")
+                collector.record(**row)
+                send_command(socket, "resume")
 
-        elif msg == "finished":
-            send_command(socket, "ok")
-            break
+            elif msg == "finished":
+                send_command(socket, "ok")
+                break
+
+    finally:
+        if collector is not None:
+            collector.close()
