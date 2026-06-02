@@ -217,9 +217,14 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# CSV
+# output files
 output/*.csv
+output/*.png
+output/*.jpg
+output/*.jpeg
+output/*.pdf
 
 #apsim files
 *.apsimx.bak
 *.db
+
