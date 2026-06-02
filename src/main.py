@@ -40,10 +40,10 @@ soil_water_values = csv_reader.get_columns_data(['[Soil].Water.PAW_0',
                                              '[Soil].Water.PAW_4',
                                              '[Soil].Water.PAW_5',
                                              '[Soil].Water.PAW_6',])
-soil_water_values = list(soil_water_values.values())
 
 line_plot(x=it_values, 
-          y=soil_water_values, 
+          y=list(soil_water_values.values()),
+          labels=list(soil_water_values.keys()),
           title="Soil Water over Iterations", 
           xlabel="Iteration", 
           ylabel="Soil Water (mm)", 
