@@ -31,17 +31,30 @@ print(f"\nSimulação concluída em {elapsed:.2f}s | Memória: {mem_mb:.1f} MB")
 print(f"Resultados salvos em {OUTPUT_CSV}")
 print(csv_reader.df)
 
-it_array = csv_reader.get_columns_data('iteration')
-it_soil_water = csv_reader.get_columns_data('[Soil].Water.PAW_0')
+it_values = csv_reader.get_columns_data('iteration')
+weather_rain_values = csv_reader.get_columns_data('[Weather].Rain')
+soil_water_values = csv_reader.get_columns_data(['[Soil].Water.PAW_0', 
+                                             '[Soil].Water.PAW_1', 
+                                             '[Soil].Water.PAW_2',
+                                             '[Soil].Water.PAW_3',
+                                             '[Soil].Water.PAW_4',
+                                             '[Soil].Water.PAW_5',
+                                             '[Soil].Water.PAW_6',])
+soil_water_values = list(soil_water_values.values())
 
-print(it_array)
-print(it_soil_water)
-
-line_plot(x=it_array, 
-          y=it_soil_water, 
+line_plot(x=it_values, 
+          y=soil_water_values, 
           title="Soil Water over Iterations", 
           xlabel="Iteration", 
           ylabel="Soil Water (mm)", 
           file_name="soil_water_over_iterations")
+
+bar_plot(x=it_values,
+         y=weather_rain_values,
+         title="Rain over Iterations",
+         xlabel="Iteration",
+         ylabel="Rain Water (mm)",
+         file_name="rain_water_over_iterations_bar",
+        )
 
 close_zmq2(apsim)
