@@ -219,10 +219,10 @@ __marimo__/
 
 # output files
 output/*.csv
-output/*.png
-output/*.jpg
-output/*.jpeg
-output/*.pdf
+output/**/*.png
+output/**/*.jpg
+output/**/*.jpeg
+output/**/*.pdf
 
 #apsim files
 *.apsimx.bak
