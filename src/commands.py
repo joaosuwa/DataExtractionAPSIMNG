@@ -20,13 +20,13 @@ def _fetch_row(socket, field_reader: FieldReader) -> dict:
     for var in field_reader.variables:
         send_command(socket, "get", [var])
         value = msgpack.unpackb(socket.recv())
-        key = field_reader.to_key(var)
+        #key = field_reader.to_key(var)
 
         if isinstance(value, list):
             for i, v in enumerate(value):
-                row[f"{key}_{i}"] = v
+                row[f"{var}_{i}"] = v
         else:
-            row[key] = value
+            row[var] = value
 
     return row
 

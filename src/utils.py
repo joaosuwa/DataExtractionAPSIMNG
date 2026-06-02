@@ -1,3 +1,4 @@
+from functools import singledispatchmethod
 import re
 import pandas as pd
 import csv
@@ -14,7 +15,7 @@ class FieldReader:
         [Soil].Water.PAW
     """
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str):
         self.path = path
         self.variables: list[str] = self._load(path)
 
@@ -28,24 +29,10 @@ class FieldReader:
                     variables.append(line)
         return variables
 
-    @staticmethod
-    def to_key(var: str) -> str:
-        """
-        Converte uma expressão APSIM em uma chave compatível com CSV.
-
-        Exemplos:
-            [Clock].Today.Day  ->  clock_today_day
-            [Soil].Water.PAW   ->  soil_water_paw
-        """
-        s = re.sub(r"[\[\]]", "", var) 
-        s = re.sub(r"[^a-zA-Z0-9]+", "_", s) 
-        return s.strip("_").lower()
-
     def __repr__(self) -> str:
         return f"FieldReader({self.path!r}, {len(self.variables)} variáveis)"
 
 class CSVReader:
-
     def __init__(self, path: str) -> None:
         self.path = path
         self.df = pd.read_csv(path)
@@ -56,5 +43,14 @@ class CSVReader:
     def get_rows(self) -> List[List[Any]]:
         return self.df.values.tolist()
 
-    def get_columns_data(self, columns: List[str]) -> Dict[str, List[Any]]:
+    @singledispatchmethod
+    def get_columns_data(self, columns):
+        raise TypeError("O parâmetro 'columns' deve ser uma string ou uma lista.")
+
+    @get_columns_data.register
+    def _(self, columns: str) -> List[Any]:
+        return self.df[columns].tolist()
+
+    @get_columns_data.register
+    def _(self, columns: list) -> Dict[str, List[Any]]:
         return self.df[columns].to_dict(orient='list')
